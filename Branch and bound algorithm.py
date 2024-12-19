@@ -44,7 +44,6 @@ def branch_and_bound(capacity, revenues, days):
             level = current.level + 1
         
         if level < n:
-            # Left child (include the current project)
             left = Node(level=level,
                         profit=current.profit + revenues[level],
                         weight=current.weight + days[level],
@@ -60,7 +59,6 @@ def branch_and_bound(capacity, revenues, days):
             if left.bound > max_profit:
                 nodes.append(left)
             
-            # Right child (exclude the current project)
             right = Node(level=level,
                          profit=current.profit,
                          weight=current.weight,
@@ -73,37 +71,30 @@ def branch_and_bound(capacity, revenues, days):
     return max_profit, best_items
 
 def solve_knapsack_from_csv(file_path, capacity_column, profit_column, capacity):
-    # Load CSV file
+
     df = pd.read_csv(file_path)
     
-    # Check if required columns are present
     if capacity_column not in df.columns or profit_column not in df.columns:
         raise ValueError(f"The columns '{capacity_column}' and '{profit_column}' must be present in the CSV file.")
     
-    # Extract revenues and days
     revenues = df[profit_column].tolist()
     days = df[capacity_column].tolist()
     
-    # Solve using branch and bound
     max_profit, selected_projects = branch_and_bound(capacity, revenues, days)
     
-    # Get selected project IDs
     selected_project_ids = [df.index[i] + 1 for i, x in enumerate(selected_projects) if x == 1]
     return max_profit, selected_project_ids
 
 if __name__ == "__main__":
-    # Path to CSV file
-    file_path = "C:/Users/DELL/Documents/Optimization/Example.txt"  # Replace with your file path
+
+    file_path = "C:/Users/DELL/Documents/Optimization/Example.txt"  # Replace with file path
     
-    # Specify the column names for Days and Revenue
-    capacity_column = "Days"  # Column for days
-    profit_column = "Revenue"  # Column for revenues
+    capacity_column = "Days"  
+    profit_column = "Revenue"  
     
-    # Ask user to input total available days (capacity)
     total_days = int(input("Enter the total number of available researcher days: ")) 
     
     try:
-        # Call the function with the provided data and capacity
         max_profit, selected_projects = solve_knapsack_from_csv(file_path, capacity_column, profit_column, total_days)
         print(f"Maximum Profit: {max_profit}")
         print(f"Selected Projects: {', '.join(map(str, selected_projects))}")
